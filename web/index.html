@@ -1,20 +1,64 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title> DDU Img Bed </title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            /*overflow: hidden;*/
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        p {
+            background: #999999;
+            padding-left: 40%;
+            font-family: "Source Code Pro";
+            font-size: 30px;
+        }
+
+        .bed_tag {
+            position: absolute;
+            z-index: 10000; /* put .gold-box above .green-box and .dashed-box */
+            background: gold;
+            width: 80%;
+            left: 60px;
+            top: 3em;
+        }
+        #progressBarZone{
+        }
+    </style>
+    <link rel="stylesheet" href="prism.css">
+    <script src="prism.js"></script>
+    <script src="three.min.js"></script>
 </head>
 <body>
-<div id="progressBarZone">请将文件拖拽进浏览器内！ <br/></div>
+<div id="progressBarZone">
+    <p>图床Ver 1.0</p>
+    <p>拖拽[到网页上]</p>
+    <p>截图或者复制[粘贴]</p>
+    <p></p>
+</div>
+<!--<script src="gls.js"></script>-->
 </body>
 
 <script>
     var progressBarZone = document.getElementById('progressBarZone');
+    var body_tag = document.body;
 
-    function sendFile(files,callback) {
+    function sendFile(files, callback) {
         if (!files || files.length != 1) {
             return;
         }
-
         var percent = document.createElement('div');
         progressBarZone.appendChild(percent);
 
@@ -26,7 +70,7 @@
 
             formData.append('files', file);       // 往FormData对象添加File对象
 
-            fileNames += '<' + file.name + '>， ';
+            fileNames = '<' + file.name + '>';
         }
 
         var xhr = new XMLHttpRequest();
@@ -42,10 +86,10 @@
             }, false); // false表示在事件冒泡阶段处理
         xhr.upload.onload = function (r) {
             console.log(xhr.response)
-            percent.innerHTML = fileNames + '上传完成。';
+            percent.innerHTML = fileNames + '上传完成,已经帮您选中文本,Ctrl + C  即可。';
         };
 
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 callback(xhr.response);
             }
@@ -63,17 +107,66 @@
         e.preventDefault();            // 必须调用。否则浏览器会进行默认处理，比如文本类型的文件直接打开，非文本的可能弹出一个下载文件框。
     }, false);
 
+    document.addEventListener('paste', function (event) {
+        var items = (event.clipboardData || window.clipboardData).items;
+        var file = null;
+        if (items && items.length) {
+            // 搜索剪切板items
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    console.log(items[i].type)
+                    file = items[i].getAsFile();
+                    break;
+                }
+            }
+        }
+        sendFile([file], function (r) {
+            var UrlTempLate = document.createElement('div');
+            UrlTempLate.style.background = "green";
+            UrlTempLate.style.fontFamily = "Arial, Helvetica, sans-serif";
+            UrlTempLate.style.borderRadius="2px";
+            UrlTempLate.style.fontSize = "20px";
+            progressBarZone.appendChild(UrlTempLate);
+            let josnData = JSON.parse(r);
+            UrlTempLate.innerHTML = `![请添加描述](${window.location}look_look/${josnData.data})`
+            var range = document.createRange();
+            range.selectNode(UrlTempLate);
+            window.getSelection().addRange(range);
+            try {
+                if (document.execCommand) {
+                    // 复制选中的文字到剪贴板
+                    document.execCommand("copy");
+                }
+            } catch {
+                //
+                alert("不支持复制命令")
+            }
+            console.log(JSON.stringify(r))
+        });
+    }, false);
+
     document.addEventListener("drop", function (e) {
         e.stopPropagation();
         e.preventDefault();            // 必须调用。否则浏览器会进行默认处理，比如文本类型的文件直接打开，非文本的可能弹出一个下载文件框。
 
-        sendFile(e.dataTransfer.files,function (r) {
+        sendFile(e.dataTransfer.files, function (r) {
             var UrlTempLate = document.createElement('div');
+            UrlTempLate.style.background = "green";
+            UrlTempLate.style.fontFamily = "Arial, Helvetica, sans-serif";
+            UrlTempLate.style.fontSize = "20px";
+            UrlTempLate.style.borderRadius="2px";
             progressBarZone.appendChild(UrlTempLate);
-            let josnData = JSON.parse(r)
+            let josnData = JSON.parse(r);
             UrlTempLate.innerHTML = `![请添加描述](${window.location}look_look/${josnData.data})`
             console.log(JSON.stringify(r))
         });
     }, false);
+    $(document).on('ready', function () {
+        $('#bgc').particleground({
+            dotColor: '#f0f0f0',
+            lineColor: '#f0f0f0',
+            parallax: false
+        });
+    });
 </script>
 </html>

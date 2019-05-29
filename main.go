@@ -407,7 +407,7 @@ func GetMsg(code int) string {
 	case ERROR:
 		return "Error"
 	case SUCCESS:
-		return "Error"
+		return "Successfully"
 	}
 	return ""
 }

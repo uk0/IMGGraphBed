@@ -16,3 +16,9 @@
 * 账号体系等
 * Real shard 
 * ...
+
+
+### show
+
+
+![](readme.gif)

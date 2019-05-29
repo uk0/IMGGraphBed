@@ -21,11 +21,16 @@ import (
 const SUCCESS = 200
 const PORT = 8443
 const ERROR = 400
-const USE_HDFS = false
 
+var Config = GetConfig()
+
+/*
+HDFS 文件系统存储文件
+*/
 func HDFSPutFromFile(client *hdfs.Client, reader io.Reader, dest string) {
-	_, err := client.Stat(dest)
-	writer, err := client.Create(dest)
+	vPath := fmt.Sprintf("%s/%s", Config.Hdfs.RootPath, dest)
+	_, err := client.Stat(vPath)
+	writer, err := client.Create(vPath)
 	defer writer.Close()
 	_, err = io.Copy(writer, reader)
 	if err != nil {
@@ -33,8 +38,12 @@ func HDFSPutFromFile(client *hdfs.Client, reader io.Reader, dest string) {
 	}
 }
 
+/**
+本地文件系统存储文件
+*/
 func PutFromFile(reader io.Reader, dest string) {
-	out, err := os.Create(dest)
+	vPath := fmt.Sprintf("%s/%s", Config.Local.RootPath, dest)
+	out, err := os.Create(vPath)
 	if err != nil {
 	}
 	defer out.Close()
@@ -230,12 +239,12 @@ func (this *Uuid) GobDecode(data []byte) (err error) {
 }
 
 func GetInstance() *hdfs.Client {
-	hdfsClient, _ := hdfs.New("cdh-m1.sxkj.online:8020,cdh-m2.sxkj.online:8020")
+	hdfsClient, _ := hdfs.New(Config.Hdfs.Namenode)
 	return hdfsClient
 }
 
 func HDFSGetFile(client *hdfs.Client, fileName string) []byte {
-	imgPath := fmt.Sprintf("/resource/pic/%s", fileName)
+	imgPath := fmt.Sprintf("%s/%s", Config.Hdfs.RootPath, fileName)
 	file, _ := client.Open(imgPath)
 	defer file.Close()
 	bytes, err := ioutil.ReadAll(file)
@@ -247,7 +256,7 @@ func HDFSGetFile(client *hdfs.Client, fileName string) []byte {
 	return bytes
 }
 func GetFile(fileName string) []byte {
-	imgPath := fmt.Sprintf("/resource/pic/%s", fileName)
+	imgPath := fmt.Sprintf("%s/%s", Config.Local.RootPath, fileName)
 	bytes, err := ioutil.ReadFile(imgPath)
 	if err != nil {
 		fmt.Print(err)
@@ -330,6 +339,7 @@ func LdapLogin(c *gin.Context) {
 
 func main() {
 	router := gin.Default()
+	gin.SetMode(gin.DebugMode)
 	router.Use(func(c *gin.Context) {
 		c.Next() // next handler func
 	})
@@ -338,14 +348,17 @@ func main() {
 	router.GET("/look_look/:imgName", func(c *gin.Context) {
 		imgName := c.Param("imgName")
 		fileData := []byte{}
-		if USE_HDFS {
+		switch Config.Select {
+		case "hdfs":
 			fileData = HDFSGetFile(GetInstance(), imgName)
-		} else {
+		case "local":
 			fileData = GetFile(imgName)
+		case "qiniu":
+
 		}
-		if "application/octet-stream"==GetCT(GetFix(imgName)){
+		if "application/octet-stream" == GetCT(GetFix(imgName)) {
 			c.Writer.Header().Set("Content-Type", GetCT(GetFix(imgName)))
-			c.Writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"",imgName))
+			c.Writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", imgName))
 			c.Writer.Header().Set("Content-Length", strconv.Itoa(len(fileData)))
 			c.Writer.Write(fileData)
 		}
@@ -363,11 +376,13 @@ func main() {
 		filename := header.Filename
 		ImgNameUUId := NewUuid()
 		imgName := fmt.Sprintf("%s.%s", ImgNameUUId, GetFix(filename))
-		imgPath := fmt.Sprintf("/resource/pic/%s", imgName)
-		if USE_HDFS {
-			HDFSPutFromFile(GetInstance(), file, imgPath)
-		} else {
-			PutFromFile(file, imgPath)
+
+		switch Config.Select {
+		case "hdfs":
+			HDFSPutFromFile(GetInstance(), file, imgName)
+		case "local":
+			PutFromFile(file, imgName)
+		case "qiniu":
 		}
 		fmt.Println(file, err, filename)
 		if err != nil {
@@ -396,12 +411,3 @@ func GetMsg(code int) string {
 	}
 	return ""
 }
-
-/**
-curl -X POST \
-  http://127.0.0.1:3000/upload/image \
-  -H 'content-type: multipart/form-data;
-  -F file=Pictures/162402h8yxhdbeqbxxex8z.png
-
-
-**/

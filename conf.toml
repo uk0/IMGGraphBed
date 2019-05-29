@@ -1,0 +1,10 @@
+Select="local"
+[Qiniu]
+AccessKey="9Zctl1ro_QMLg3TaQ"
+SecretKey="4syYqkVMgvzeSaUTh"
+bucket="bucket-images-firsh"
+[Hdfs]
+namenode="cdh1-namenode:8020,cdh2-namenode:8020"
+rootPath="/resource/pic/" # chmod -R 777 
+[Local]
+rootPath="/Users/zhangjianxin/Pictures"

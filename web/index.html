@@ -11,45 +11,218 @@
             margin: 0;
             padding: 0;
         }
-        html {
-            /*overflow: hidden;*/
+
+        html, body {
+            background: #222;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            font-family: "Source Code Pro", serif;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        div.background {
+            background-image: url('JH9R-hqzxptn4703740.gif');
+            background-size: 100%, 100%;
+            background-repeat: repeat-y;
             position: absolute;
             width: 100%;
             height: 100%;
         }
 
-        p {
-            background: #999999;
-            padding-left: 40%;
-            font-family: "Source Code Pro";
-            font-size: 30px;
+        div.progressBarZone p {
+            margin: 0;
+            position: absolute;
+            border-radius: 4px;
+            border: 2px solid green;
+            font-size: 39px;
+            top: 16%;
+            left: 50%;
+            animation-duration: 2s;
+            animation-name: changeColor;
+            animation-iteration-count: infinite;
+            margin-right: -50%;
+            box-shadow: 10px 10px 5px #888888;
+            transform: translate(-50%, -50%)
+
+        }
+        @keyframes changeColor {
+            0% {
+                border-color: #1C50A8;
+                background: #1C50A8;
+            }
+            24% {
+                border-color: #1C50A8;
+                background: #1C50A8;
+            }
+            25% {
+                border-color: white;
+                background: white;
+            }
+            100% {
+                border-color: white;
+                background: #1C5011;
+
+            }
         }
 
-        .bed_tag {
+        .view {
             position: absolute;
-            z-index: 10000; /* put .gold-box above .green-box and .dashed-box */
-            background: gold;
-            width: 80%;
-            left: 60px;
-            top: 3em;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            -webkit-perspective: 400;
+            perspective: 400;
         }
-        #progressBarZone{
+
+        .plane {
+            width: 120px;
+            height: 120px;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
+
+        .plane.main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            -webkit-transform: rotateX(60deg) rotateZ(-30deg);
+            transform: rotateX(60deg) rotateZ(-30deg);
+            -webkit-animation: rotate 20s infinite linear;
+            animation: rotate 20s infinite linear;
+        }
+
+        .plane.main .circle {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+            border-radius: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 0 60px crimson, inset 0 0 60px crimson;
+        }
+
+        .plane.main .circle::before, .plane.main .circle::after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            width: 10%;
+            height: 10%;
+            border-radius: 100%;
+            background: crimson;
+            box-sizing: border-box;
+            box-shadow: 0 0 60px 2px crimson;
+        }
+
+        .plane.main .circle::before {
+            -webkit-transform: translateZ(-90px);
+            transform: translateZ(-90px);
+        }
+
+        .plane.main .circle::after {
+            -webkit-transform: translateZ(90px);
+            transform: translateZ(90px);
+        }
+
+        .plane.main .circle:nth-child(1) {
+            -webkit-transform: rotateZ(72deg) rotateX(63.435deg);
+            transform: rotateZ(72deg) rotateX(63.435deg);
+        }
+
+        .plane.main .circle:nth-child(2) {
+            -webkit-transform: rotateZ(144deg) rotateX(63.435deg);
+            transform: rotateZ(144deg) rotateX(63.435deg);
+        }
+
+        .plane.main .circle:nth-child(3) {
+            -webkit-transform: rotateZ(216deg) rotateX(63.435deg);
+            transform: rotateZ(216deg) rotateX(63.435deg);
+        }
+
+        .plane.main .circle:nth-child(4) {
+            -webkit-transform: rotateZ(288deg) rotateX(63.435deg);
+            transform: rotateZ(288deg) rotateX(63.435deg);
+        }
+
+        .plane.main .circle:nth-child(5) {
+            -webkit-transform: rotateZ(360deg) rotateX(63.435deg);
+            transform: rotateZ(360deg) rotateX(63.435deg);
+        }
+
+        @-webkit-keyframes rotate {
+            0% {
+                -webkit-transform: rotateX(0) rotateY(0) rotateZ(0);
+                transform: rotateX(0) rotateY(0) rotateZ(0);
+            }
+            100% {
+                -webkit-transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+                transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                -webkit-transform: rotateX(0) rotateY(0) rotateZ(0);
+                transform: rotateX(0) rotateY(0) rotateZ(0);
+            }
+            100% {
+                -webkit-transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+                transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+            }
+        }
+
+
     </style>
 </head>
 <body>
-<div id="progressBarZone">
-    <p>图床Ver 1.0</p>
-    <p>拖拽[到网页上]</p>
-    <p>截图或者复制[粘贴]</p>
-    <p></p>
+<div class="view">
+    <div class="background">
+        <div id="progressBarZone" class="progressBarZone">
+            <p>Copy screen capture and drag image </p>
+        </div>
+    </div>
+    <div class="plane main">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
 </div>
-<!--<script src="gls.js"></script>-->
+
 </body>
 
 <script>
     var progressBarZone = document.getElementById('progressBarZone');
     var body_tag = document.body;
+
+    function showImg(file, preview) {
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    }
 
     function sendFile(files, callback) {
         if (!files || files.length != 1) {
@@ -82,7 +255,7 @@
             }, false); // false表示在事件冒泡阶段处理
         xhr.upload.onload = function (r) {
             console.log(xhr.response)
-            percent.innerHTML = fileNames + '上传完成,已经帮您选中文本,Ctrl + C  即可。';
+            percent.innerHTML = fileNames + '上传完成,点击Copy即可。';
         };
 
         xhr.onreadystatechange = function () {
@@ -98,6 +271,36 @@
         xhr.send(formData);            // 发送表单对象。
     }
 
+    function Copy(containerid) {
+        if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(document.getElementById(containerid));
+            range.select().createTextRange();
+            document.execCommand("copy");
+
+        } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById(containerid));
+            window.getSelection().addRange(range);
+            document.execCommand("copy");
+            alert("text copied")
+        }
+    }
+
+    function DrawDiv(r) {
+        var UrlTempLate = document.createElement('div');
+        UrlTempLate.style.background = "green";
+        UrlTempLate.style.fontFamily = "Arial, Helvetica, sans-serif";
+        UrlTempLate.style.borderRadius = "2px";
+        UrlTempLate.style.fontSize = "20px";
+        progressBarZone.appendChild(UrlTempLate);
+        let josnData = JSON.parse(r);
+        let UID = guid();
+        UrlTempLate.id = UID;
+        UrlTempLate.innerHTML = `![请添加描述](${window.location}look_look/${josnData.data}) <button onclick="Copy(\`${UID}\`)">Copy</button>`
+        console.log("1. Copy Success" + UID)
+    }
+
     document.addEventListener("dragover", function (e) {
         e.stopPropagation();
         e.preventDefault();            // 必须调用。否则浏览器会进行默认处理，比如文本类型的文件直接打开，非文本的可能弹出一个下载文件框。
@@ -110,52 +313,33 @@
             // 搜索剪切板items
             for (var i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf('image') !== -1) {
-                    console.log(items[i].type)
+                    console.log(items[i].type);
                     file = items[i].getAsFile();
                     break;
                 }
             }
         }
+        var dom = document.createElement('img');
+        dom.style.height = "200px";
+        showImg(file, dom);
+        progressBarZone.appendChild(dom);
         sendFile([file], function (r) {
-            var UrlTempLate = document.createElement('div');
-            UrlTempLate.style.background = "green";
-            UrlTempLate.style.fontFamily = "Arial, Helvetica, sans-serif";
-            UrlTempLate.style.borderRadius="2px";
-            UrlTempLate.style.fontSize = "20px";
-            progressBarZone.appendChild(UrlTempLate);
-            let josnData = JSON.parse(r);
-            UrlTempLate.innerHTML = `![请添加描述](${window.location}look_look/${josnData.data})`
-            var range = document.createRange();
-            range.selectNode(UrlTempLate);
-            window.getSelection().addRange(range);
-            try {
-                if (document.execCommand) {
-                    // 复制选中的文字到剪贴板
-                    document.execCommand("copy");
-                }
-            } catch {
-                //
-                alert("不支持复制命令")
-            }
-            console.log(JSON.stringify(r))
+            DrawDiv(r)
         });
     }, false);
+
 
     document.addEventListener("drop", function (e) {
         e.stopPropagation();
         e.preventDefault();            // 必须调用。否则浏览器会进行默认处理，比如文本类型的文件直接打开，非文本的可能弹出一个下载文件框。
-
-        sendFile(e.dataTransfer.files, function (r) {
-            var UrlTempLate = document.createElement('div');
-            UrlTempLate.style.background = "green";
-            UrlTempLate.style.fontFamily = "Arial, Helvetica, sans-serif";
-            UrlTempLate.style.fontSize = "20px";
-            UrlTempLate.style.borderRadius="2px";
-            progressBarZone.appendChild(UrlTempLate);
-            let josnData = JSON.parse(r);
-            UrlTempLate.innerHTML = `![请添加描述](${window.location}look_look/${josnData.data})`
-            console.log(JSON.stringify(r))
-        });
+        sendFile(e.dataTransfer.files, DrawDiv(r));
     }, false);
+
+    function guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 </script>
 </html>

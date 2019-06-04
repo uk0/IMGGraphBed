@@ -15,9 +15,5 @@ go build  -o mac_IMG -tags static ./
 
 
   sshpass -p ${PASS}  scp  IMGGraphBed  root@172.17.0.200:/opt/
+#  sshpass -p ${PASS}  scp  conf.toml   root@172.17.0.200:/opt/
   sshpass -p ${PASS}  scp  -r web   root@172.17.0.200:/opt/
-
-PASS=Bigsfintech2018
-
-  sshpass -p ${PASS}  scp  IMGGraphBed  root@47.100.111.255:/opt/
-  sshpass -p ${PASS}  scp  -r web   root@47.100.111.255:/opt/

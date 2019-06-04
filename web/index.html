@@ -24,6 +24,11 @@
             font-size: 16px;
         }
 
+
+        .boxInLine {
+            display: inline
+        }
+
         div.background {
             background-image: url('JH9R-hqzxptn4703740.gif');
             background-size: 100%, 100%;
@@ -31,13 +36,14 @@
             position: absolute;
             width: 100%;
             height: 100%;
+            padding-top: 106px
         }
 
         div.progressBarZone p {
             margin: 0;
             position: absolute;
             border-radius: 4px;
-            border: 2px solid green;
+            border: 2px solid rgba(18, 20, 19, 0.39);
             font-size: 39px;
             top: 16%;
             left: 50%;
@@ -49,6 +55,7 @@
             transform: translate(-50%, -50%)
 
         }
+
         @keyframes changeColor {
             0% {
                 border-color: #1C50A8;
@@ -60,7 +67,7 @@
             }
             25% {
                 border-color: white;
-                background: white;
+                background: #a8fff5;
             }
             100% {
                 border-color: white;
@@ -77,6 +84,96 @@
             bottom: 0;
             -webkit-perspective: 400;
             perspective: 400;
+        }
+
+
+        .Touch_left {
+            background: #464646;
+            border: 2px solid #370a99;
+            border-radius: 3px;
+            animation-name: sml;
+            font-size: 26px;
+            text-align: center;
+            width: 200px;
+            height: 88px;
+            z-index: 100000;
+            animation-duration: 1ms;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+        }
+
+        .Touch_right {
+            background: #464646;
+            border: 2px solid #370a99;
+            border-radius: 3px;
+            animation-name: smr;
+            width: 200px;
+            font-size: 26px;
+            text-align: center;
+            height: 88px;
+            z-index: 100000;
+            animation-duration: 8s;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes smr {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 1;
+                transform: translateX(1px);
+            }
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-200px);
+            }
+        }
+
+        @keyframes sml {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-200px);
+            }
+        }
+
+
+        .show_url {
+            position: relative;
+            background: #888888;
+            padding-top: 2px;
+            width: 90%;
+        }
+
+        .copy_btn {
+
+            display: inline-block;
+            box-sizing: border-box;
+            box-shadow: 0 0 60px crimson, inset 0 0 60px crimson;
+            border-radius: 4px;
+            border: 2px solid #1C50A8;
+            position: absolute;
+            background: blueviolet;
+            width: 10%;
+            right: 0;
+        }
+
+        .copy_btn:hover {
+            box-sizing: border-box;
+            box-shadow: 0 0 60px #5adc6f, inset 0 0 60px #4ad3dc;
+            border-radius: 4px;
+            border: 2px solid #1C50A8;
+            position: absolute;
+            background: #370a99;
+            width: 10%;
+            right: 0;
         }
 
         .plane {
@@ -188,6 +285,7 @@
     </style>
 </head>
 <body>
+<div id="Touch" class="Touch_left">Touch</div>
 <div class="view">
     <div class="background">
         <div id="progressBarZone" class="progressBarZone">
@@ -195,7 +293,6 @@
         </div>
     </div>
     <div class="plane main">
-        <div class="circle"></div>
         <div class="circle"></div>
         <div class="circle"></div>
         <div class="circle"></div>
@@ -239,7 +336,7 @@
 
             formData.append('files', file);       // 往FormData对象添加File对象
 
-            fileNames = '<' + file.name + '>';
+            fileNames = '' + files[i].name + '';
         }
 
         var xhr = new XMLHttpRequest();
@@ -270,35 +367,60 @@
         xhr.open('post', '/upload/image', true);
         xhr.send(formData);            // 发送表单对象。
     }
-
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
     function Copy(containerid) {
+        var touch = document.getElementById("Touch")
         if (document.selection) {
             var range = document.body.createTextRange();
             range.moveToElementText(document.getElementById(containerid));
             range.select().createTextRange();
             document.execCommand("copy");
-
+            touch.className = "Touch_right";
+            touch.innerText = "text copied";
         } else if (window.getSelection) {
             var range = document.createRange();
             range.selectNode(document.getElementById(containerid));
             window.getSelection().addRange(range);
             document.execCommand("copy");
-            alert("text copied")
+            touch.className = "Touch_right";
+            touch.innerText = "text copied";
         }
+        setInterval(function () {
+            touch.className="Touch_left"
+        },8000);
     }
 
-    function DrawDiv(r) {
+    function CreateDIV() {
         var UrlTempLate = document.createElement('div');
-        UrlTempLate.style.background = "green";
-        UrlTempLate.style.fontFamily = "Arial, Helvetica, sans-serif";
-        UrlTempLate.style.borderRadius = "2px";
         UrlTempLate.style.fontSize = "20px";
-        progressBarZone.appendChild(UrlTempLate);
+        UrlTempLate.style.width = "80%";
+        return UrlTempLate;
+    }
+
+    function DrawDiv(r, file) {
+
+        var tempDom = CreateDIV();
+        progressBarZone.appendChild(tempDom);
+
+        var dom = document.createElement('img');
+        dom.style.height = "200px";
+        console.log("FileName ", file.name)
+        showImg(file, dom);
+        tempDom.appendChild(dom);
+
+
         let josnData = JSON.parse(r);
         let UID = guid();
-        UrlTempLate.id = UID;
-        UrlTempLate.innerHTML = `![请添加描述](${window.location}look_look/${josnData.data}) <button onclick="Copy(\`${UID}\`)">Copy</button>`
-        console.log("1. Copy Success" + UID)
+        var newDom = CreateDIV();
+        newDom.innerHTML = `<div class="boxInLine show_url" id=${UID}>${window.location}look_look/${josnData.data}</div> <div class="boxInLine copy_btn" onclick="Copy(\`${UID}\`)">Copy</div>`
+        tempDom.appendChild(newDom);
+        UID = guid();
+        newDom = CreateDIV();
+        newDom.innerHTML = `<div class="boxInLine show_url" id=${UID}>![请添加描述](${window.location}look_look/${josnData.data})</div> <div  class="boxInLine copy_btn" onclick="Copy(\`${UID}\`)">Copy</div>`
+        tempDom.appendChild(newDom);
+        console.log("Tag UUID" + UID)
     }
 
     document.addEventListener("dragover", function (e) {
@@ -308,31 +430,28 @@
 
     document.addEventListener('paste', function (event) {
         var items = (event.clipboardData || window.clipboardData).items;
-        var file = null;
+        console.log(items);
+        var files = new Array();
         if (items && items.length) {
             // 搜索剪切板items
             for (var i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf('image') !== -1) {
-                    console.log(items[i].type);
-                    file = items[i].getAsFile();
+                    files.push(items[i].getAsFile());
                     break;
                 }
             }
         }
-        var dom = document.createElement('img');
-        dom.style.height = "200px";
-        showImg(file, dom);
-        progressBarZone.appendChild(dom);
-        sendFile([file], function (r) {
-            DrawDiv(r)
+        sendFile(files, function (r) {
+            DrawDiv(r, files[0])
         });
     }, false);
-
-
     document.addEventListener("drop", function (e) {
         e.stopPropagation();
         e.preventDefault();            // 必须调用。否则浏览器会进行默认处理，比如文本类型的文件直接打开，非文本的可能弹出一个下载文件框。
-        sendFile(e.dataTransfer.files, DrawDiv(r));
+
+        sendFile(e.dataTransfer.files, function (r) {
+            DrawDiv(r, e.dataTransfer.files[0])
+        });
     }, false);
 
     function guid() {
